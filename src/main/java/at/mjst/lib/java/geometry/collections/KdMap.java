@@ -12,7 +12,7 @@ import at.mjst.lib.java.geometry.entities.KdPoint;
  * @author Ing. Michael J. Stallinger (projects@mjst.at)
  * @since 2016-06-04
  */
-interface KdMap<DataType> extends Iterable<DataType>
+public interface KdMap<DataType> extends Iterable<DataType>
 {
     /**
      * Adds an item to the map. A key with same offsets cannot be added twice!

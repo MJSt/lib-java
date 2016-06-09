@@ -22,7 +22,7 @@ import at.mjst.lib.java.geometry.entities.KdPoint;
  * @author Ing. Michael J. Stallinger (projects@mjst.at)
  * @since 2016-05-31
  */
-class HashTreeKdMap<DataType> implements KdMap<DataType>
+public class HashTreeKdMap<DataType> implements KdMap<DataType>
 {
     private int dimensionCount;
     private Node root;
