@@ -1,9 +1,32 @@
-group 'Libraries'
-version '2016.05.00'
-
 apply plugin: 'java'
+// maven and signing are needed for the archive to be uploaded to the 'sonatype nexus'
+//  see: https://oss.sonatype.org/#stagingRepositories
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+// groupId
+group 'at.mjst'
+version '1.0.0'
+// build version#
+String getVersionWithBuildIncrement() {
+    Properties props = new Properties()
+    File propsFile = new File('version.properties')
+    props.load(propsFile.newDataInputStream())
+    Integer major = ((props.getProperty('major')) as Integer)
+    Integer minor = ((props.getProperty('minor')) as Integer)
+    Integer build = ((props.getProperty('build')) as Integer) + 1
+    props.setProperty('build', build.toString())
+    props.store(propsFile.newWriter(), null)
+    return "$major.$minor.$build"
+}
+
+version getVersionWithBuildIncrement()
 
 sourceCompatibility = 1.8
+
+sourceSets {
+    main
+}
 
 repositories {
     mavenCentral()
@@ -12,4 +35,70 @@ repositories {
 dependencies {
     compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+// signing and uploading configuration depend on an external gradle.properties file from default gradle-home
+//  see this file for further information - this is NOT in git-repository, since it stores secret credentials!
+signing {
+    sign configurations.archives
+}
+
+// the upload task to sign and upload the build to the sonatype nexus (where it can be released to maven-central)
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Common Java library'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Common libraries/utilities to support active development'
+                url 'https://github.com/MJSt/lib-java'
+
+                scm {
+                    connection 'scm:git:git://github.com/MJSt/lib-java.git'
+                    developerConnection 'scm:git:git@github.com:MJSt/lib-java.git'
+                    url 'https://github.com/MJSt/lib-java'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'MJSt'
+                        name 'Michael J. Stallinger'
+                        email 'projects@mjst.at'
+                    }
+                }
+            }
+        }
+    }
 }
