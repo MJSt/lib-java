@@ -28,7 +28,7 @@ public class HashTreeKdMap<DataType> implements KdMap<DataType>
     private Node root;
     private List<Container> index;
 
-    HashTreeKdMap(int dimensionCount)
+    public HashTreeKdMap(int dimensionCount)
     {
         if (dimensionCount <= 0) {
             throw new IllegalArgumentException(ExceptionText.DIMENSION_COUNT_GREATER_ZERO_REQUIRED);
