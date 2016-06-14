@@ -14,15 +14,19 @@ String getVersionWithBuildIncrement() {
     props.load(propsFile.newDataInputStream())
     Integer major = ((props.getProperty('major')) as Integer)
     Integer minor = ((props.getProperty('minor')) as Integer)
-    Integer build = ((props.getProperty('build')) as Integer) + 1
-    props.setProperty('build', build.toString())
-    props.store(propsFile.newWriter(), null)
+    Integer build = ((props.getProperty('build')) as Integer)
+    // ToDo: do increment after tag, build & upload!
+//    Integer build = ((props.getProperty('build')) as Integer) + 1
+//    props.setProperty('build', build.toString())
+//    props.store(propsFile.newWriter(), null)
     return "$major.$minor.$build"
 }
 
 version getVersionWithBuildIncrement()
 
-sourceCompatibility = 1.8
+// needed to enable dependencies in android projects not yet supporting 1.8
+targetCompatibility = 1.7
+sourceCompatibility = 1.7
 
 sourceSets {
     main
